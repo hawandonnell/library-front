@@ -2,14 +2,17 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 
+import useSWR, { useSWRConfig } from "swr";
+
 import Header from "../../../components/Header";
 
-export default function ChangeAuthor({ author }) {
+function ChangeAuthorContent({ author, router }) {
 	const [firstName, setFirstName] = useState(author.firstName);
 	const [lastName, setLastName] = useState(author.lastName);
 	const [birthAt, setBirthAt] = useState(author.birthAt);
 
-	const router = useRouter();
+	const { mutate } = useSWRConfig();
+
 	return (
 		<div className="container">
 			<style jsx>{`
@@ -31,6 +34,7 @@ export default function ChangeAuthor({ author }) {
 				<input
 					type="text"
 					name="lastName"
+					defaultValue={author.lastName}
 					value={lastName}
 					onChange={(e) => setLastName(e.target.value)}
 				/>
@@ -56,6 +60,10 @@ export default function ChangeAuthor({ author }) {
 									birthAt: Number(birthAt),
 								},
 							});
+							await mutate(
+								`https://sheltered-beach-31872.herokuapp.com/author/${author.id}`
+							);
+
 							router.push("/authors");
 						}}
 					>
@@ -66,30 +74,45 @@ export default function ChangeAuthor({ author }) {
 		</div>
 	);
 }
+// Wrapper to fetch data
+export default function ChangeAuthor() {
+	const router = useRouter();
+	const { id } = router.query;
 
-export async function getStaticPaths() {
-	const res = await fetch(
-		"https://sheltered-beach-31872.herokuapp.com/authors"
+	const { data: author, error } = useSWR(
+		`https://sheltered-beach-31872.herokuapp.com/author/${id}`,
+		(url) => fetch(url).then((res) => res.json())
 	);
-	const authors = await res.json();
 
-	const paths = authors.map((author) => ({
-		params: { id: author.id.toString() },
-	}));
+	if (error) return <h1>Error: {error}</h1>;
+	if (!author) return <h1>Loading</h1>;
 
-	return {
-		paths,
-		fallback: false,
-	};
+	return <ChangeAuthorContent author={author} router={router} />;
 }
 
-export async function getStaticProps({ params }) {
-	const resAuthor = await fetch(
-		`https://sheltered-beach-31872.herokuapp.com/author/${params.id}`
-	);
-	const author = await resAuthor.json();
+// export async function getStaticPaths() {
+// 	const res = await fetch(
+// 		"https://sheltered-beach-31872.herokuapp.com/authors"
+// 	);
+// 	const authors = await res.json();
 
-	return {
-		props: { author },
-	};
-}
+// 	const paths = authors.map((author) => ({
+// 		params: { id: author.id.toString() },
+// 	}));
+
+// 	return {
+// 		paths,
+// 		fallback: false,
+// 	};
+// }
+
+// export async function getStaticProps({ params }) {
+// 	const resAuthor = await fetch(
+// 		`https://sheltered-beach-31872.herokuapp.com/author/${params.id}`
+// 	);
+// 	const author = await resAuthor.json();
+
+// 	return {
+// 		props: { author },
+// 	};
+// }

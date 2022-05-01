@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import axios from "axios";
 
+import useSWR, { useSWRConfig } from "swr";
+
 import Header from "../../../components/Header";
 
 async function changeBook(id, title, publishedAt, authorId) {
@@ -19,12 +21,12 @@ async function changeBook(id, title, publishedAt, authorId) {
 	return res;
 }
 
-function ChangeBook({ book, authors }) {
+function ChangeBookContent({ book, authors, router }) {
 	const [title, setTitle] = useState(book.title);
 	const [publishedAt, setPublishedAt] = useState(book.publishedAt);
 	const [authorId, setAuthorId] = useState(book.authorId);
 
-	const router = useRouter();
+	const { mutate } = useSWRConfig();
 	return (
 		<div className="container">
 			<style jsx>{`
@@ -74,8 +76,13 @@ function ChangeBook({ book, authors }) {
 					<button
 						type="submit"
 						onClick={() =>
-							changeBook(book.id, title, publishedAt, authorId).then(() =>
-								router.push("/")
+							changeBook(book.id, title, publishedAt, authorId).then(
+								async () => {
+									await mutate(
+										`https://sheltered-beach-31872.herokuapp.com/book/${book.id}`
+									);
+									router.push("/");
+								}
 							)
 						}
 					>
@@ -87,33 +94,52 @@ function ChangeBook({ book, authors }) {
 	);
 }
 
-export async function getStaticPaths() {
-	const res = await fetch("https://sheltered-beach-31872.herokuapp.com/books");
-	const books = await res.json();
+function ChangeBook() {
+	const router = useRouter();
+	const { id } = router.query;
 
-	const paths = books.map((book) => ({
-		params: { id: book.id.toString() },
-	}));
+	const { data: book, error: bookError } = useSWR(
+		`https://sheltered-beach-31872.herokuapp.com/book/${id}`,
+		(url) => fetch(url).then((res) => res.json())
+	);
+	const { data: authors, error: authorsError } = useSWR(
+		"https://sheltered-beach-31872.herokuapp.com/authors",
+		(url) => fetch(url).then((res) => res.json())
+	);
 
-	return {
-		paths,
-		fallback: false,
-	};
+	if (!book || !authors) return <h1>Loading</h1>;
+	if (bookError || authorsError) return <h1>Error</h1>;
+
+	return <ChangeBookContent book={book} authors={authors} router={router} />;
 }
 
-export async function getStaticProps({ params }) {
-	const resBook = await fetch(
-		`https://sheltered-beach-31872.herokuapp.com/book/${params.id}`
-	);
-	const resAuthors = await fetch(
-		"https://sheltered-beach-31872.herokuapp.com/authors"
-	);
-	const book = await resBook.json();
-	const authors = await resAuthors.json();
+// export async function getStaticPaths() {
+// 	const res = await fetch("https://sheltered-beach-31872.herokuapp.com/books");
+// 	const books = await res.json();
 
-	return {
-		props: { book, authors },
-	};
-}
+// 	const paths = books.map((book) => ({
+// 		params: { id: book.id.toString() },
+// 	}));
+
+// 	return {
+// 		paths,
+// 		fallback: false,
+// 	};
+// }
+
+// export async function getStaticProps({ params }) {
+// 	const resBook = await fetch(
+// 		`https://sheltered-beach-31872.herokuapp.com/book/${params.id}`
+// 	);
+// 	const resAuthors = await fetch(
+// 		"https://sheltered-beach-31872.herokuapp.com/authors"
+// 	);
+// 	const book = await resBook.json();
+// 	const authors = await resAuthors.json();
+
+// 	return {
+// 		props: { book, authors },
+// 	};
+// }
 
 export default ChangeBook;
