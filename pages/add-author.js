@@ -12,12 +12,7 @@ export default function AddAuthor() {
 	const router = useRouter();
 	return (
 		<div className="container">
-			<style jsx>{`
-				.form__buttons {
-					margin-top: 2rem;
-				}
-			`}</style>
-			<Header pageName="Добавить автора"></Header>
+			<Header pageName="Добавить автора" isPageLoaded></Header>
 			<form onSubmit={(e) => e.preventDefault()}>
 				<label htmlFor="firstName">Имя: </label>
 				<input

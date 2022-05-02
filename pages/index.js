@@ -1,6 +1,4 @@
-import Head from "next/head";
 import Link from "next/link";
-import styles from "../styles/Home.module.css";
 import useSWR, { useSWRConfig } from "swr";
 
 import Header from "../components/Header";
@@ -19,39 +17,49 @@ function Home() {
 	);
 
 	if (error) return <h1>Error: {error}</h1>;
-	if (!books) return <h1>Loading</h1>;
+	if (!books)
+		return (
+			<>
+				<Header pageName="Книги" isPageLoaded={false}></Header>
+				<h1>Loading</h1>
+			</>
+		);
 
 	return (
-		<div className="container">
-			<Header pageName="Книги"></Header>
+		<>
+			<Header pageName="Книги" isPageLoaded={true}></Header>
 			<main>
-				{books.map((book) => (
-					<article key={book.id}>
-						<header className={styles.books__header}>
-							<h3 className={styles.books__title}>{book.title}</h3>
-							<button>
-								<Link href={`/change-book/${book.id}`}>Изменить</Link>
-							</button>
-							<button
-								onClick={() =>
-									deleteBook(book.id).then(() =>
-										mutate("https://sheltered-beach-31872.herokuapp.com/books")
-									)
-								}
-							>
-								Удалить
-							</button>
-						</header>
-						<p>
-							<b>Автор:</b> {book.author.firstName} {book.author.lastName}
-						</p>
-						<p>
-							<b>Год публикации:</b> {book.publishedAt}
-						</p>
-					</article>
-				))}
+				<div className="container">
+					{books.map((book) => (
+						<article key={book.id}>
+							<header className="article__header">
+								<h3 className="article__title">{book.title}</h3>
+								<button>
+									<Link href={`/change-book/${book.id}`}>Изменить</Link>
+								</button>
+								<button
+									onClick={() =>
+										deleteBook(book.id).then(() =>
+											mutate(
+												"https://sheltered-beach-31872.herokuapp.com/books"
+											)
+										)
+									}
+								>
+									Удалить
+								</button>
+							</header>
+							<p>
+								<b>Автор:</b> {book.author.firstName} {book.author.lastName}
+							</p>
+							<p>
+								<b>Год публикации:</b> {book.publishedAt}
+							</p>
+						</article>
+					))}
+				</div>
 			</main>
-		</div>
+		</>
 	);
 }
 
