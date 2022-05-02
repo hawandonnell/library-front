@@ -80,5 +80,6 @@ export async function getStaticProps() {
 		props: {
 			authors,
 		},
+		revalidate: 10,
 	};
 }
