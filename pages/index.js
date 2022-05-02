@@ -1,5 +1,4 @@
 import Link from "next/link";
-import styles from "../styles/Home.module.css";
 import useSWR, { useSWRConfig } from "swr";
 
 import Header from "../components/Header";
@@ -36,8 +35,8 @@ function Home() {
 					{books.map((book) => (
 						<>
 							<article key={book.id}>
-								<header className={styles.books__header}>
-									<h3 className={styles.books__title}>{book.title}</h3>
+								<header className="article__header">
+									<h3 className="article__title">{book.title}</h3>
 									<button>
 										<Link href={`/change-book/${book.id}`}>Изменить</Link>
 									</button>

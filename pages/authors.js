@@ -1,6 +1,5 @@
 import Link from "next/link";
 import useSWR, { useSWRConfig } from "swr";
-import styles from "../styles/Home.module.css";
 
 import Header from "../components/Header";
 import CustomHead from "../components/CustomHead";
@@ -36,8 +35,8 @@ export default function Authors() {
 					{authors.map((author) => (
 						<>
 							<article key={author.id}>
-								<header className={styles.books__header}>
-									<h3 className={styles.books__title}>
+								<header className="article__header">
+									<h3 className="article__title">
 										{author.firstName} {author.lastName}
 									</h3>
 									<button>
