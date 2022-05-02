@@ -7,6 +7,7 @@ import axios from "axios";
 import useSWR, { useSWRConfig } from "swr";
 
 import Header from "../../../components/Header";
+import CustomHead from "../../../components/CustomHead";
 
 async function changeBook(id, title, publishedAt, authorId) {
 	let res = await axios({
@@ -28,69 +29,67 @@ function ChangeBookContent({ book, authors, router }) {
 
 	const { mutate } = useSWRConfig();
 	return (
-		<div className="container">
-			<style jsx>{`
-				.form__buttons {
-					margin-top: 2rem;
-				}
-			`}</style>
-			<Header pageName="Изменить книгу"></Header>
-			<form onSubmit={(e) => e.preventDefault()}>
-				<label htmlFor="title">Название: </label>
-				<input
-					type="text"
-					name="title"
-					value={title}
-					onChange={(e) => {
-						setTitle(e.target.value);
-					}}
-				/>
-				<br />
-				<label htmlFor="publishedAt">Год публикации: </label>
-				<input
-					type="number"
-					name="publishedAt"
-					value={publishedAt}
-					onChange={(e) => {
-						setPublishedAt(e.target.value);
-					}}
-				/>
-				<br />
-				<label htmlFor="author">Автор: </label>
-				<select
-					name="author"
-					value={authorId}
-					onChange={(e) => {
-						setAuthorId(e.target.value);
-					}}
-				>
-					{authors.map((author) => (
-						<option key={author.id} value={author.id}>
-							{author.firstName} {author.lastName}
-						</option>
-					))}
-				</select>
-				<br />
-				<div className="form__buttons">
-					<button onClick={() => router.push("/")}>Отмена</button>
-					<button
-						type="submit"
-						onClick={() =>
-							changeBook(book.id, title, publishedAt, authorId).then(
-								async () => {
-									await mutate(
-										`https://sheltered-beach-31872.herokuapp.com/book/${book.id}`
-									);
-									router.push("/");
-								}
-							)
-						}
+		<>
+			<CustomHead pageName="Изменить книгу" />
+			<Header pageName="Изменить книгу" />
+			<div className="container" style={{ marginTop: "2rem" }}>
+				<form onSubmit={(e) => e.preventDefault()}>
+					<label htmlFor="title">Название: </label>
+					<input
+						type="text"
+						name="title"
+						value={title}
+						onChange={(e) => {
+							setTitle(e.target.value);
+						}}
+					/>
+					<br />
+					<label htmlFor="publishedAt">Год публикации: </label>
+					<input
+						type="number"
+						name="publishedAt"
+						value={publishedAt}
+						onChange={(e) => {
+							setPublishedAt(e.target.value);
+						}}
+					/>
+					<br />
+					<label htmlFor="author">Автор: </label>
+					<select
+						name="author"
+						value={authorId}
+						onChange={(e) => {
+							setAuthorId(e.target.value);
+						}}
 					>
-						Сохранить
-					</button>
-				</div>
-			</form>
-		</div>
+						{authors.map((author) => (
+							<option key={author.id} value={author.id}>
+								{author.firstName} {author.lastName}
+							</option>
+						))}
+					</select>
+					<br />
+					<div className="form__buttons">
+						<button onClick={() => router.push("/")}>Отмена</button>
+						<button
+							type="submit"
+							onClick={() =>
+								changeBook(book.id, title, publishedAt, authorId).then(
+									async () => {
+										await mutate(
+											`https://sheltered-beach-31872.herokuapp.com/book/${book.id}`
+										);
+										router.push("/");
+									}
+								)
+							}
+						>
+							Сохранить
+						</button>
+					</div>
+				</form>
+			</div>
+		</>
 	);
 }
 
@@ -107,7 +106,13 @@ function ChangeBook() {
 		(url) => fetch(url).then((res) => res.json())
 	);
 
-	if (!book || !authors) return <h1>Loading</h1>;
+	if (!book || !authors)
+		return (
+			<>
+				<CustomHead pageName="Loading" />
+				<h1>Loading</h1>
+			</>
+		);
 	if (bookError || authorsError) return <h1>Error</h1>;
 
 	return <ChangeBookContent book={book} authors={authors} router={router} />;

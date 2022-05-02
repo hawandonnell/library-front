@@ -7,13 +7,20 @@ body {
 }
 
 a {
-	color: inherit;
+	color: #707070;
+	text-decoration: none;
 }
 
-* {
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
 }
 
 .container {
 	padding: 0 2rem;
+}
+
+.form__buttons {
+	margin-top: 2rem;
 }

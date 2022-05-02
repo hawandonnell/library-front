@@ -5,6 +5,7 @@ import axios from "axios";
 import useSWR from "swr";
 
 import Header from "../components/Header";
+import CustomHead from "../components/CustomHead";
 
 function AddBookContent({ authors }) {
 	const [title, setTitle] = useState("");
@@ -14,63 +15,61 @@ function AddBookContent({ authors }) {
 	const router = useRouter();
 
 	return (
-		<div className="container">
-			<style jsx>{`
-				.form__buttons {
-					margin-top: 2rem;
-				}
-			`}</style>
-			<Header pageName="Добавить книгу"></Header>
-			<form onSubmit={(e) => e.preventDefault()}>
-				<label htmlFor="title">Название: </label>
-				<input
-					type="text"
-					name="title"
-					onChange={(e) => setTitle(e.target.value)}
-				/>
-				<br />
-				<label htmlFor="publishedAt">Год публикации: </label>
-				<input
-					type="number"
-					name="publishedAt"
-					onChange={(e) => setPublishedAt(e.target.value)}
-				/>
-				<br />
-				<label htmlFor="author">Автор: </label>
-				<select
-					name="author"
-					onChange={(e) => {
-						setAuthorId(e.target.value);
-					}}
-				>
-					{authors.map((author) => (
-						<option key={author.id} value={author.id}>
-							{author.firstName} {author.lastName}
-						</option>
-					))}
-				</select>
-				<div className="form__buttons">
-					<button onClick={() => router.push("/")}>Отмена</button>
-					<button
-						type="submit"
-						onClick={async () => {
-							await axios({
-								method: "post",
-								url: "https://sheltered-beach-31872.herokuapp.com/book",
-								data: {
-									title,
-									publishedAt: Number(publishedAt),
-									authorId: Number(authorId),
-								},
-							});
-							router.push("/");
+		<>
+			<CustomHead pageName="Добавить книгу" />
+			<Header pageName="Добавить книгу" />
+			<div className="container" style={{ marginTop: "2rem" }}>
+				<form onSubmit={(e) => e.preventDefault()}>
+					<label htmlFor="title">Название: </label>
+					<input
+						type="text"
+						name="title"
+						onChange={(e) => setTitle(e.target.value)}
+					/>
+					<br />
+					<label htmlFor="publishedAt">Год публикации: </label>
+					<input
+						type="number"
+						name="publishedAt"
+						onChange={(e) => setPublishedAt(e.target.value)}
+					/>
+					<br />
+					<label htmlFor="author">Автор: </label>
+					<select
+						name="author"
+						onChange={(e) => {
+							setAuthorId(e.target.value);
 						}}
 					>
-						Добавить
-					</button>
-				</div>
-			</form>
-		</div>
+						{authors.map((author) => (
+							<option key={author.id} value={author.id}>
+								{author.firstName} {author.lastName}
+							</option>
+						))}
+					</select>
+					<div className="form__buttons">
+						<button onClick={() => router.push("/")}>Отмена</button>
+						<button
+							type="submit"
+							onClick={async () => {
+								await axios({
+									method: "post",
+									url: "https://sheltered-beach-31872.herokuapp.com/book",
+									data: {
+										title,
+										publishedAt: Number(publishedAt),
+										authorId: Number(authorId),
+									},
+								});
+								router.push("/");
+							}}
+						>
+							Добавить
+						</button>
+					</div>
+				</form>
+			</div>
+		</>
 	);
 }
 
@@ -81,7 +80,13 @@ export default function AddBook() {
 	);
 
 	if (error) return <h1>Error: {error}</h1>;
-	if (!authors) return <h1>Loading</h1>;
+	if (!authors)
+		return (
+			<>
+				<CustomHead pageName="Loading" />
+				<h1>Loading</h1>
+			</>
+		);
 
 	return <AddBookContent authors={authors} />;
 }
