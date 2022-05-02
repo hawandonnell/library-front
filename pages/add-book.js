@@ -2,14 +2,17 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 
+import useSWR from "swr";
+
 import Header from "../components/Header";
 
-export default function AddBook({ authors }) {
+function AddBookContent({ authors }) {
 	const [title, setTitle] = useState("");
 	const [publishedAt, setPublishedAt] = useState("");
 	const [authorId, setAuthorId] = useState(authors[0].id);
 
 	const router = useRouter();
+
 	return (
 		<div className="container">
 			<style jsx>{`
@@ -71,15 +74,14 @@ export default function AddBook({ authors }) {
 	);
 }
 
-export async function getStaticProps() {
-	const res = await fetch(
-		"https://sheltered-beach-31872.herokuapp.com/authors"
+export default function AddBook() {
+	const { data: authors, error } = useSWR(
+		"https://sheltered-beach-31872.herokuapp.com/authors",
+		(url) => fetch(url).then((res) => res.json())
 	);
-	const authors = await res.json();
-	return {
-		props: {
-			authors,
-		},
-		revalidate: 10,
-	};
+
+	if (error) return <h1>Error: {error}</h1>;
+	if (!authors) return <h1>Loading</h1>;
+
+	return <AddBookContent authors={authors} />;
 }
