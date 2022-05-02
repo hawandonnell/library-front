@@ -1,5 +1,7 @@
+import Head from "next/head";
 import Link from "next/link";
 import useSWR, { useSWRConfig } from "swr";
+import styles from "../styles/Home.module.css";
 
 import Header from "../components/Header";
 
@@ -17,49 +19,39 @@ export default function Authors() {
 	);
 
 	if (error) return <h1>Error: {error}</h1>;
-	if (!authors)
-		return (
-			<>
-				<Header pageName="Авторы" isPageLoaded={false}></Header>
-				<h1>Loading</h1>
-			</>
-		);
+	if (!authors) return <h1>Loading</h1>;
 
 	return (
-		<>
-			<Header pageName="Авторы" isPageLoaded={true}></Header>
+		<div className="container">
+			<Header pageName="Авторы"></Header>
 			<main>
-				<div className="container">
-					<main>
-						{authors.map((author) => (
-							<article key={author.id}>
-								<header className="article__header">
-									<h3 className="article__title">
-										{author.firstName} {author.lastName}
-									</h3>
-									<button>
-										<Link href={`/change-author/${author.id}`}>Изменить</Link>
-									</button>
-									<button
-										onClick={() =>
-											deleteAuthor(author.id).then(() =>
-												mutate(
-													"https://sheltered-beach-31872.herokuapp.com/authors"
-												)
-											)
-										}
-									>
-										Удалить
-									</button>
-								</header>
-								<p>
-									<b>Год рождения:</b> {author.birthAt}
-								</p>
-							</article>
-						))}
-					</main>
-				</div>
+				{authors.map((author) => (
+					<article key={author.id}>
+						<header className={styles.books__header}>
+							<h3 className={styles.books__title}>
+								{author.firstName} {author.lastName}
+							</h3>
+							<button>
+								<Link href={`/change-author/${author.id}`}>Изменить</Link>
+							</button>
+							<button
+								onClick={() =>
+									deleteAuthor(author.id).then(() =>
+										mutate(
+											"https://sheltered-beach-31872.herokuapp.com/authors"
+										)
+									)
+								}
+							>
+								Удалить
+							</button>
+						</header>
+						<p>
+							<b>Год рождения:</b> {author.birthAt}
+						</p>
+					</article>
+				))}
 			</main>
-		</>
+		</div>
 	);
 }

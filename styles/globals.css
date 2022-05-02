@@ -17,16 +17,3 @@ a {
 .container {
 	padding: 0 2rem;
 }
-
-.article__header {
-	display: flex;
-	align-items: center;
-}
-
-.article__title {
-	margin-right: 2rem;
-}
-
-.form__buttons {
-	margin-top: 2rem;
-}

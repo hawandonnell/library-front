@@ -12,7 +12,12 @@ export default function AddBook({ authors }) {
 	const router = useRouter();
 	return (
 		<div className="container">
-			<Header pageName="Добавить книгу" isPageLoaded></Header>
+			<style jsx>{`
+				.form__buttons {
+					margin-top: 2rem;
+				}
+			`}</style>
+			<Header pageName="Добавить книгу"></Header>
 			<form onSubmit={(e) => e.preventDefault()}>
 				<label htmlFor="title">Название: </label>
 				<input
@@ -75,6 +80,5 @@ export async function getStaticProps() {
 		props: {
 			authors,
 		},
-		revalidate: 10,
 	};
 }
